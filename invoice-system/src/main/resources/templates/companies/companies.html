@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>IDEC — Manage Congsigunes</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
+</head>
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-name">IDEC</div>
+            <div class="brand-sub">Shipping &amp; Trading (PVT) LTD</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a th:href="@{/dashboard}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Overview
+            </a>
+            <div th:unless="${isAdmin}" class="nav-section-label">Jobs</div>
+            <a th:unless="${isAdmin}" th:href="@{/jobs/add}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Add New Job
+            </a>
+            <a th:href="@{/jobs}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                All Jobs
+            </a>
+            <a th:href="@{/jobs(invoiceStatus='PAID')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PAID'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Paid Invoices</span>
+                <span class="badge badge-done" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePaidJobsCount}">0</span>
+            </a>
+            <a th:href="@{/jobs(invoiceStatus='PENDING')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PENDING'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Pending Invoices</span>
+                <span class="badge badge-pending" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePendingJobsCount}">0</span>
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Summary Report
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report/profit}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                Profit Report
+            </a>
+            <div class="nav-section-label">Settings</div>
+            <a th:href="@{/companies}" class="nav-link active">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Manage Congsigunes
+            </a>
+
+            <a th:if="${isAdmin}" th:href="@{/change-password}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Change Password
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar" th:text="${#strings.substring(username,0,1).toUpperCase()}">A</div>
+                <div>
+                    <div class="user-name" th:text="${username}">admin</div>
+                    <div class="user-role" th:text="${userRole}">Administrator</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="nav-link" style="width:100%">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-title">Manage Congsigunes</div>
+            <div class="topbar-right">
+                <div id="dash-clock" class="topbar-clock">--:--:--</div>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <!-- Flash -->
+            <div th:if="${success}" class="flash flash-success">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span th:text="${success}"></span>
+            </div>
+            <div th:if="${error}" class="flash flash-error">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Add Company Form -->
+            <div class="form-section" style="margin-bottom:24px;">
+                <div class="form-section-header">
+                    <div class="form-section-icon icon-gold">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    </div>
+                    <div>
+                        <div id="form-title" class="form-section-title">Add New Congsigune</div>
+                        <div id="form-desc" class="form-section-desc">Add congsigunes to use in the job entry dropdown</div>
+                    </div>
+                </div>
+
+                <form id="companyForm" th:action="@{/companies/add}" th:object="${newCompany}" method="post">
+                    <div class="form-grid cols-3" style="align-items:end;">
+                        <div>
+                            <label class="form-label" for="co-name">Congsigune Name <span class="required">*</span></label>
+                            <input type="text" id="co-name" th:field="*{name}" class="form-control" placeholder="e.g. ABC Imports Ltd" required/>
+                        </div>
+                        <div>
+                            <label class="form-label" for="co-contact">Contact Person</label>
+                            <input type="text" id="co-contact" th:field="*{contactPerson}" class="form-control" placeholder="Full name"/>
+                        </div>
+                        <div>
+                            <label class="form-label" for="co-phone">Phone</label>
+                            <input type="text" id="co-phone" th:field="*{phone}" class="form-control" placeholder="+94 77 000 0000"/>
+                        </div>
+                        <div>
+                            <label class="form-label" for="co-tin">TIN No</label>
+                            <input type="text" id="co-tin" th:field="*{tinNo}" class="form-control" placeholder="e.g. 123456789"/>
+                        </div>
+                        <div>
+                            <label class="form-label" for="co-address">Address</label>
+                            <input type="text" id="co-address" th:field="*{address}" class="form-control" placeholder="Company Address"/>
+                        </div>
+                        <div>
+                            <label class="form-label" for="co-email">Email Address</label>
+                            <input type="email" id="co-email" th:field="*{email}" class="form-control" placeholder="email@company.com"/>
+                        </div>
+                        <div style="grid-column:span 3;display:flex;justify-content:flex-end;padding-top:4px;gap:8px;">
+                            <button type="button" id="cancel-edit-btn" class="btn btn-outline" style="display:none;">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-gold">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                <span id="submit-btn-text">Add Congsigune</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Companies Table -->
+            <div class="card" style="padding:0;">
+                <div style="padding:20px 24px 0;">
+                    <div class="section-title">Saved Congsigunes</div>
+                    <div class="section-subtitle" style="margin-top:3px;" th:text="${#lists.size(companies)} + ' congsigunes registered'"></div>
+                </div>
+                <div class="table-wrap" style="margin-top:16px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Congsigune Name</th>
+                                <th>Contact Person</th>
+                                <th>Phone</th>
+                                <th>TIN No</th>
+                                <th>Address</th>
+                                <th>Email Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(companies)}">
+                                <td colspan="8">
+                                    <div class="empty-state">
+                                         <p>No congsigunes added yet.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="co, stat : ${companies}">
+                                <td th:text="${stat.count}">1</td>
+                                <td class="bold" th:text="${co.name}">—</td>
+                                <td th:text="${co.contactPerson ?: '—'}">—</td>
+                                <td th:text="${co.phone ?: '—'}">—</td>
+                                <td th:text="${co.tinNo ?: '—'}">—</td>
+                                <td th:text="${co.address ?: '—'}">—</td>
+                                <td th:text="${co.email ?: '—'}">—</td>
+                                <td>
+                                    <div style="display:flex;gap:6px;align-items:center;">
+                                        <button type="button" class="btn btn-outline btn-sm" title="Edit"
+                                                th:attr="data-id=${co.id},data-name=${co.name},data-contact=${co.contactPerson},data-phone=${co.phone},data-tin=${co.tinNo},data-address=${co.address},data-email=${co.email}"
+                                                onclick="editCompany(this)">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            Edit
+                                        </button>
+                                        <form th:action="@{/companies/delete/{id}(id=${co.id})}" method="post"
+                                               onsubmit="return confirm('Remove congsigune?');" style="margin:0;display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                                                Remove
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+(function(){const el=document.getElementById('dash-clock');function tick(){el.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});}tick();setInterval(tick,1000);})();
+
+function editCompany(btn) {
+    const id = btn.getAttribute('data-id');
+    const name = btn.getAttribute('data-name');
+    const contact = btn.getAttribute('data-contact') || '';
+    const phone = btn.getAttribute('data-phone') || '';
+    const tin = btn.getAttribute('data-tin') || '';
+    const address = btn.getAttribute('data-address') || '';
+    const email = btn.getAttribute('data-email') || '';
+
+    // Populate inputs
+    document.getElementById('co-name').value = name;
+    document.getElementById('co-contact').value = contact;
+    document.getElementById('co-phone').value = phone;
+    document.getElementById('co-tin').value = tin;
+    document.getElementById('co-address').value = address;
+    document.getElementById('co-email').value = email;
+
+    // Change form target/action and labels
+    const form = document.getElementById('companyForm');
+    form.action = '/companies/edit/' + id;
+    document.getElementById('form-title').textContent = 'Edit Congsigune';
+    document.getElementById('form-desc').textContent = 'Modify the selected congsigune details';
+    document.getElementById('submit-btn-text').textContent = 'Update Congsigune';
+    document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+
+    // Scroll to the top/form
+    form.scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    // Reset inputs
+    document.getElementById('co-name').value = '';
+    document.getElementById('co-contact').value = '';
+    document.getElementById('co-phone').value = '';
+    document.getElementById('co-tin').value = '';
+    document.getElementById('co-address').value = '';
+    document.getElementById('co-email').value = '';
+
+    // Revert form target/action and labels
+    const form = document.getElementById('companyForm');
+    form.action = '/companies/add';
+    document.getElementById('form-title').textContent = 'Add New Congsigune';
+    document.getElementById('form-desc').textContent = 'Add congsigunes to use in the job entry dropdown';
+    document.getElementById('submit-btn-text').textContent = 'Add Congsigune';
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+}
+
+document.getElementById('cancel-edit-btn').addEventListener('click', cancelEdit);
+</script>
+</body>
+</html>

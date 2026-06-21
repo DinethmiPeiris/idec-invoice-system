@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>IDEC — Job Details</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
+</head>
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-name">IDEC</div>
+            <div class="brand-sub">Shipping &amp; Trading (PVT) LTD</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a th:href="@{/dashboard}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Overview
+            </a>
+            <div th:unless="${isAdmin}" class="nav-section-label">Jobs</div>
+            <a th:unless="${isAdmin}" th:href="@{/jobs/add}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Add New Job
+            </a>
+            <a th:href="@{/jobs}" class="nav-link" th:classappend="${invoiceStatusFilter == null} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                All Jobs
+            </a>
+            <a th:href="@{/jobs(invoiceStatus='PAID')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PAID'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Paid Invoices</span>
+                <span class="badge badge-done" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePaidJobsCount}">0</span>
+            </a>
+            <a th:href="@{/jobs(invoiceStatus='PENDING')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PENDING'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Pending Invoices</span>
+                <span class="badge badge-pending" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePendingJobsCount}">0</span>
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Summary Report
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report/profit}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                Profit Report
+            </a>
+            <div class="nav-section-label">Settings</div>
+            <a th:href="@{/companies}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Manage Congsigunes
+            </a>
+
+            <a th:if="${isAdmin}" th:href="@{/change-password}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Change Password
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar" th:text="${#strings.substring(username,0,1).toUpperCase()}">A</div>
+                <div>
+                    <div class="user-name" th:text="${username}">admin</div>
+                    <div class="user-role" th:text="${userRole}">Administrator</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="nav-link" style="width:100%">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:14px;">
+                <div class="topbar-title" th:text="'Job #' + ${job.jobNo}">Job Details</div>
+                <span class="badge"
+                      th:classappend="${job.status == 'PENDING'} ? 'badge-pending' : (${job.status == 'IN_PROGRESS'} ? 'badge-inprog' : 'badge-done')"
+                      th:text="${job.status == 'IN_PROGRESS'} ? 'In Progress' : ${#strings.capitalize(#strings.toLowerCase(job.status))}">
+                </span>
+            </div>
+            <div class="topbar-right">
+                <div id="dash-clock" class="topbar-clock">--:--:--</div>
+                <a th:href="@{/jobs/edit/{id}(id=${job.id})}" class="btn btn-gold">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Edit Job
+                </a>
+                <a th:if="${isAdmin}" th:href="@{/jobs/invoice/{id}(id=${job.id})}" class="btn btn-gold" target="_blank">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    Generate Invoice
+                </a>
+                <a th:href="@{/jobs}" class="btn btn-outline">← Back</a>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <!-- Invoice Status Selector -->
+            <div class="form-section" style="margin-bottom:16px; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:12px; flex-wrap:wrap; gap:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <div style="width:34px; height:34px; border-radius:8px; background:rgba(200,168,75,0.1); color:var(--gold); display:flex; align-items:center; justify-content:center;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </div>
+                    <div>
+                        <div style="font-size:14px; font-weight:600; color:var(--white);">Invoice Status</div>
+                        <div th:if="${isAdmin}" style="font-size:12px; color:var(--slate); margin-top:2px;">Select whether the invoice is paid or pending for this job.</div>
+                        <div th:unless="${isAdmin}" style="font-size:12px; color:var(--slate); margin-top:2px;">Current billing status for this job.</div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                    <span style="font-size:14px; font-weight:600; color:var(--slate);">Current Status:</span>
+                    <span class="badge"
+                          th:classappend="${job.invoiceStatus == 'PAID'} ? 'badge-done' : 'badge-pending'"
+                          th:text="${job.invoiceStatus ?: 'PENDING'}"
+                          style="font-size:12.5px; padding:6px 14px; margin-right:8px;">
+                    </span>
+                    <form th:if="${isAdmin}" th:action="@{/jobs/invoice-status/{id}(id=${job.id})}" method="post" style="display:inline-flex; gap:10px;">
+                        <button type="submit" name="invoiceStatus" value="PAID" class="btn"
+                                style="padding:10px 22px; font-size:13.5px; border-radius:8px; cursor:pointer; border:1.5px solid var(--done); font-weight:700; font-family:inherit; transition:all 0.2s;"
+                                th:styleappend="${job.invoiceStatus == 'PAID'} ? 'background:var(--done); color:var(--navy-deep);' : 'background:transparent; color:var(--done);'"
+                                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Paid</button>
+                        <button type="submit" name="invoiceStatus" value="PENDING" class="btn"
+                                style="padding:10px 22px; font-size:13.5px; border-radius:8px; cursor:pointer; border:1.5px solid var(--pending); font-weight:700; font-family:inherit; transition:all 0.2s;"
+                                th:styleappend="${job.invoiceStatus == 'PENDING' or job.invoiceStatus == null} ? 'background:var(--pending); color:var(--navy-deep);' : 'background:transparent; color:var(--pending);'"
+                                onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Pending</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Section A -->
+            <div class="form-section" style="margin-bottom:16px;">
+                <div class="form-section-header">
+                    <div class="form-section-icon icon-blue">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                    </div>
+                    <div>
+                        <div class="form-section-title">A — Job Information</div>
+                    </div>
+                </div>
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Job No</div><div class="detail-value" th:text="${job.jobNo}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Date</div><div class="detail-value" th:text="${job.date != null ? #temporals.format(job.date,'dd MMMM yyyy') : '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Congsigune Name</div><div class="detail-value" th:text="${job.companyName ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Shipper</div><div class="detail-value" th:text="${job.shipper ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Vessel Name</div><div class="detail-value" th:text="${job.vesselName ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Status</div>
+                        <span class="badge"
+                              th:classappend="${job.status == 'PENDING'} ? 'badge-pending' : (${job.status == 'IN_PROGRESS'} ? 'badge-inprog' : 'badge-done')"
+                              th:text="${job.status == 'IN_PROGRESS'} ? 'In Progress' : ${#strings.capitalize(#strings.toLowerCase(job.status))}">
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section B -->
+            <div class="form-section" style="margin-bottom:16px;">
+                <div class="form-section-header">
+                    <div class="form-section-icon icon-gold">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                    </div>
+                    <div><div class="form-section-title">B — Vehicle / Shipment Details</div></div>
+                </div>
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Description</div><div class="detail-value" th:text="${job.description ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Drive Type</div><div class="detail-value" th:text="${job.driveType ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Chassis / Container No</div><div class="detail-value" th:text="${job.chassisContainerNo ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">BL Number</div><div class="detail-value" th:text="${job.blNumber ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Invoice Number</div><div class="detail-value" th:text="${job.invoiceNo ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Customs Register</div><div class="detail-value" th:text="${job.customsRegister ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Entry Submit</div><div class="detail-value" th:text="${job.entrySubmit ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Duty</div><div class="detail-value" th:text="${job.duty ?: '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Delivery Date</div><div class="detail-value" th:text="${job.deliveryDate != null ? #temporals.format(job.deliveryDate,'dd MMMM yyyy') : '—'}">—</div></div>
+                    <div class="detail-item"><div class="detail-label">Remarks</div><div class="detail-value" th:text="${job.remarks ?: '—'}">—</div></div>
+                </div>
+            </div>
+
+            <!-- Section C -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <div class="form-section-icon icon-green">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                    </div>
+                    <div><div class="form-section-title" th:text="${isAdmin ? 'Invoice Charge Summary (Staff Entered)' : 'C — Financials (LKR)'}">Invoice Charge Summary (Staff Entered)</div></div>
+                </div>
+
+                <div style="margin-bottom:20px;">
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">D/O Charges</div><div class="detail-value" th:text="${job.doCharges != null ? 'LKR ' + #numbers.formatDecimal(job.doCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Custom Duty</div><div class="detail-value" th:text="${job.customDutyAmount != null ? 'LKR ' + #numbers.formatDecimal(job.customDutyAmount,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">HIPG Charges</div><div class="detail-value" th:text="${job.hipgCharges != null ? 'LKR ' + #numbers.formatDecimal(job.hipgCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">CICT Charges</div><div class="detail-value" th:text="${job.cictCharges != null ? 'LKR ' + #numbers.formatDecimal(job.cictCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">DO Extension</div><div class="detail-value" th:text="${job.doExtension != null ? 'LKR ' + #numbers.formatDecimal(job.doExtension,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Valuation Expenses</div><div class="detail-value" th:text="${job.valuationExpences != null ? 'LKR ' + #numbers.formatDecimal(job.valuationExpences,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Plant Quarantine</div><div class="detail-value" th:text="${job.plantQuarantine != null ? 'LKR ' + #numbers.formatDecimal(job.plantQuarantine,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">RCT Charges</div><div class="detail-value" th:text="${job.rctCharges != null ? 'LKR ' + #numbers.formatDecimal(job.rctCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Import Control Debit</div><div class="detail-value" th:text="${job.importControlDebit != null ? 'LKR ' + #numbers.formatDecimal(job.importControlDebit,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">SLPA Bonding</div><div class="detail-value" th:text="${job.slpaBondingCharges != null ? 'LKR ' + #numbers.formatDecimal(job.slpaBondingCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Amendment Charges</div><div class="detail-value" th:text="${job.amendmentCharges != null ? 'LKR ' + #numbers.formatDecimal(job.amendmentCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Handling Expenses</div><div class="detail-value" th:text="${job.handlingExpenses != null ? 'LKR ' + #numbers.formatDecimal(job.handlingExpenses,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Documentation Expenses</div><div class="detail-value" th:text="${job.documentationExpences != null ? 'LKR ' + #numbers.formatDecimal(job.documentationExpences,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Examination</div><div class="detail-value" th:text="${job.examination != null ? 'LKR ' + #numbers.formatDecimal(job.examination,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Weigh Bridge Charges</div><div class="detail-value" th:text="${job.weighBridgeCharges != null ? 'LKR ' + #numbers.formatDecimal(job.weighBridgeCharges,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Labour</div><div class="detail-value" th:text="${job.labour != null ? 'LKR ' + #numbers.formatDecimal(job.labour,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Additional</div><div class="detail-value" th:text="${job.additional != null ? 'LKR ' + #numbers.formatDecimal(job.additional,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">VAT Registration</div><div class="detail-value" th:text="${job.vatRegistration != null ? 'LKR ' + #numbers.formatDecimal(job.vatRegistration,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Trade Registration</div><div class="detail-value" th:text="${job.tradeRegistration != null ? 'LKR ' + #numbers.formatDecimal(job.tradeRegistration,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Transport</div><div class="detail-value" th:text="${job.transport != null ? 'LKR ' + #numbers.formatDecimal(job.transport,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Other Charges</div><div class="detail-value" th:text="${job.other != null ? 'LKR ' + #numbers.formatDecimal(job.other,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Agency Fee</div><div class="detail-value" th:text="${job.agencyFee != null ? 'LKR ' + #numbers.formatDecimal(job.agencyFee,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Entry Passing</div><div class="detail-value" th:text="${job.entryPassing != null ? 'LKR ' + #numbers.formatDecimal(job.entryPassing,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Delivery Expenses</div><div class="detail-value" th:text="${job.deliveryExpenses != null ? 'LKR ' + #numbers.formatDecimal(job.deliveryExpenses,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item"><div class="detail-label">Commission</div><div class="detail-value" th:text="${job.commission != null ? 'LKR ' + #numbers.formatDecimal(job.commission,1,'COMMA',2,'POINT') : '—'}">—</div></div>
+                        <div class="detail-item" th:if="${job.customChargeName != null and !job.customChargeName.isBlank()}">
+                            <div class="detail-label" th:text="${job.customChargeName}">Custom Charge</div>
+                            <div class="detail-value" th:text="${job.customChargeValue != null ? 'LKR ' + #numbers.formatDecimal(job.customChargeValue,1,'COMMA',2,'POINT') : '—'}">—</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ══ SECTION D — PROFIT ANALYSIS (Admin + Password) ══════════ -->
+            <div class="form-section" th:if="${isAdmin}" style="margin-top:16px;position:relative;overflow:hidden;">
+                <div class="form-section-header">
+                    <div class="form-section-icon" style="background:rgba(168,85,247,0.15);color:#a855f7;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                    </div>
+                    <div>
+                        <div class="form-section-title">D &mdash; Profit Analysis</div>
+                        <div class="form-section-desc" style="color:#a855f7;font-size:12px;">&#128274; Restricted &mdash; password required</div>
+                    </div>
+                </div>
+
+                <span id="profit-data"
+                      th:attr="data-profit=${(job.blAmount != null ? job.blAmount : 0) - ((job.doCharges != null ? job.doCharges : 0) + (job.customDutyAmount != null ? job.customDutyAmount : 0) + (job.hipgCharges != null ? job.hipgCharges : 0) + (job.cictCharges != null ? job.cictCharges : 0) + (job.doExtension != null ? job.doExtension : 0) + (job.valuationExpences != null ? job.valuationExpences : 0) + (job.plantQuarantine != null ? job.plantQuarantine : 0) + (job.rctCharges != null ? job.rctCharges : 0) + (job.importControlDebit != null ? job.importControlDebit : 0) + (job.slpaBondingCharges != null ? job.slpaBondingCharges : 0) + (job.amendmentCharges != null ? job.amendmentCharges : 0) + (job.handlingExpenses != null ? job.handlingExpenses : 0) + (job.documentationExpences != null ? job.documentationExpences : 0) + (job.examination != null ? job.examination : 0) + (job.weighBridgeCharges != null ? job.weighBridgeCharges : 0) + (job.labour != null ? job.labour : 0) + (job.additional != null ? job.additional : 0) + (job.vatRegistration != null ? job.vatRegistration : 0) + (job.tradeRegistration != null ? job.tradeRegistration : 0) + (job.transport != null ? job.transport : 0) + (job.other != null ? job.other : 0) + (job.agencyFee != null ? job.agencyFee : 0) + (job.entryPassing != null ? job.entryPassing : 0) + (job.deliveryExpenses != null ? job.deliveryExpenses : 0) + (job.commission != null ? job.commission : 0) + (job.customChargeValue != null ? job.customChargeValue : 0))},
+                               data-invoice-total=${job.blAmount != null ? job.blAmount : 0},
+                               data-expenses-total=${(job.doCharges != null ? job.doCharges : 0) + (job.customDutyAmount != null ? job.customDutyAmount : 0) + (job.hipgCharges != null ? job.hipgCharges : 0) + (job.cictCharges != null ? job.cictCharges : 0) + (job.doExtension != null ? job.doExtension : 0) + (job.valuationExpences != null ? job.valuationExpences : 0) + (job.plantQuarantine != null ? job.plantQuarantine : 0) + (job.rctCharges != null ? job.rctCharges : 0) + (job.importControlDebit != null ? job.importControlDebit : 0) + (job.slpaBondingCharges != null ? job.slpaBondingCharges : 0) + (job.amendmentCharges != null ? job.amendmentCharges : 0) + (job.handlingExpenses != null ? job.handlingExpenses : 0) + (job.documentationExpences != null ? job.documentationExpences : 0) + (job.examination != null ? job.examination : 0) + (job.weighBridgeCharges != null ? job.weighBridgeCharges : 0) + (job.labour != null ? job.labour : 0) + (job.additional != null ? job.additional : 0) + (job.vatRegistration != null ? job.vatRegistration : 0) + (job.tradeRegistration != null ? job.tradeRegistration : 0) + (job.transport != null ? job.transport : 0) + (job.other != null ? job.other : 0) + (job.agencyFee != null ? job.agencyFee : 0) + (job.entryPassing != null ? job.entryPassing : 0) + (job.deliveryExpenses != null ? job.deliveryExpenses : 0) + (job.commission != null ? job.commission : 0) + (job.customChargeValue != null ? job.customChargeValue : 0)},
+                               data-pwd=${profitPassword}"
+                      style="display:none;"></span>
+
+                <!-- LOCKED state -->
+                <div id="profit-locked" style="text-align:center;padding:40px 20px;">
+                    <div style="width:64px;height:64px;border-radius:50%;background:rgba(168,85,247,0.1);border:1.5px solid rgba(168,85,247,0.3);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#a855f7;">
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <div style="font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:6px;">Profit data is locked</div>
+                    <div style="font-size:13px;color:#64748b;margin-bottom:24px;">Enter your profit password to view the analysis for this job</div>
+                    <button id="unlock-btn" onclick="showProfitModal()" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        Unlock Profit View
+                    </button>
+                </div>
+
+                <!-- UNLOCKED state (hidden initially) -->
+                <div id="profit-unlocked" style="display:none;padding-top:8px;">
+                    <div style="border-top:1px solid rgba(168,85,247,0.2);padding-top:24px;text-align:center;">
+                        <div style="font-size:11px;font-weight:700;letter-spacing:0.12em;color:#a855f7;margin-bottom:12px;">CALCULATED PROFIT / LOSS</div>
+                        <div id="profit-display" style="font-size:2.4rem;font-weight:800;margin-bottom:10px;">LKR 0.00</div>
+                        <div id="profit-label" style="display:inline-block;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;margin-bottom:20px;"></div>
+                        
+                        <!-- Totals Breakdown -->
+                        <div style="display:flex;justify-content:center;gap:30px;max-width:400px;margin:0 auto 24px;border-top:1.5px dashed rgba(255,255,255,0.06);padding-top:16px;">
+                            <div style="text-align:left;">
+                                <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Invoice Total</div>
+                                <div id="invoice-total-display" style="font-size:15px;font-weight:700;color:#f1f5f9;">LKR 0.00</div>
+                            </div>
+                            <div style="width:1px;background:rgba(255,255,255,0.06);"></div>
+                            <div style="text-align:left;">
+                                <div style="font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">Total Expenses</div>
+                                <div id="expenses-total-display" style="font-size:15px;font-weight:700;color:#f1f5f9;">LKR 0.00</div>
+                            </div>
+                        </div>
+
+                        <button onclick="lockProfit()" style="background:transparent;border:1px solid rgba(168,85,247,0.3);color:#a855f7;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">&#128274; Lock Again</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- ══ PROFIT PASSWORD MODAL ══════════════════════════════════════════════ -->
+<div id="profit-modal-overlay" onclick="handleOverlayClick(event)"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#131c2e;border:1px solid rgba(168,85,247,0.35);border-radius:18px;padding:36px 32px;width:380px;max-width:92vw;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+        <!-- Header -->
+        <div style="text-align:center;margin-bottom:28px;">
+            <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(168,85,247,0.1));border:1.5px solid rgba(168,85,247,0.4);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:#a855f7;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div style="font-size:18px;font-weight:700;color:#f1f5f9;margin-bottom:4px;">Profit Access</div>
+            <div style="font-size:13px;color:#64748b;">Enter the profit password to unlock</div>
+        </div>
+        <!-- Input -->
+        <input type="password" id="profit-pwd-input"
+               placeholder="Enter profit password"
+               onkeydown="if(event.key==='Enter')verifyProfitPassword()"
+               style="width:100%;box-sizing:border-box;background:#0c1420;border:1.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:13px 16px;color:#e2e8f0;font-size:14px;outline:none;margin-bottom:8px;transition:border-color 0.2s;"
+               onfocus="this.style.borderColor='rgba(168,85,247,0.5)'"
+               onblur="this.style.borderColor='rgba(255,255,255,0.08)'"/>
+        <div id="profit-pwd-error" style="color:#ef4444;font-size:12px;margin-bottom:12px;display:none;padding-left:2px;">
+            &#10060; Incorrect password. Please try again.
+        </div>
+        <!-- Buttons -->
+        <div style="display:flex;gap:10px;margin-top:6px;">
+            <button onclick="closeProfitModal()" style="flex:1;background:transparent;border:1px solid rgba(255,255,255,0.1);color:#94a3b8;border-radius:8px;padding:11px;font-size:13px;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">Cancel</button>
+            <button onclick="verifyProfitPassword()" style="flex:2;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;color:#fff;border-radius:8px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Unlock &rarr;</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function(){const el=document.getElementById('dash-clock');function tick(){el.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});}tick();setInterval(tick,1000);})();
+
+/* ── Profit Password Logic ── */
+function showProfitModal() {
+    const overlay = document.getElementById('profit-modal-overlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => document.getElementById('profit-pwd-input').focus(), 80);
+}
+function closeProfitModal() {
+    document.getElementById('profit-modal-overlay').style.display = 'none';
+    document.getElementById('profit-pwd-input').value = '';
+    document.getElementById('profit-pwd-error').style.display = 'none';
+}
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById('profit-modal-overlay')) closeProfitModal();
+}
+function lockProfit() {
+    document.getElementById('profit-locked').style.display = 'block';
+    document.getElementById('profit-unlocked').style.display = 'none';
+}
+function verifyProfitPassword() {
+    const input   = document.getElementById('profit-pwd-input').value;
+    const data    = document.getElementById('profit-data');
+    const correct = data ? data.getAttribute('data-pwd') : '';
+
+    if (input === correct) {
+        closeProfitModal();
+        document.getElementById('profit-locked').style.display   = 'none';
+        document.getElementById('profit-unlocked').style.display = 'block';
+
+        const raw     = parseFloat(data.getAttribute('data-profit'));
+        const invoiceTotal = parseFloat(data.getAttribute('data-invoice-total'));
+        const expensesTotal = parseFloat(data.getAttribute('data-expenses-total'));
+
+        const display = document.getElementById('profit-display');
+        const label   = document.getElementById('profit-label');
+        const abs     = Math.abs(raw).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        document.getElementById('invoice-total-display').textContent = 'LKR ' + invoiceTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        document.getElementById('expenses-total-display').textContent = 'LKR ' + expensesTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+
+        if (raw > 0) {
+            display.textContent = 'LKR ' + abs;
+            display.style.cssText += 'background:linear-gradient(135deg,#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+            label.textContent   = '▲ PROFIT';
+            label.style.cssText = 'background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);';
+        } else if (raw < 0) {
+            display.textContent = '− LKR ' + abs;
+            display.style.cssText += 'background:linear-gradient(135deg,#ef4444,#f87171);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;';
+            label.textContent   = '▼ LOSS';
+            label.style.cssText = 'background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);';
+        } else {
+            display.textContent   = 'LKR 0.00';
+            display.style.color   = '#64748b';
+            label.textContent     = '— BREAK EVEN';
+            label.style.cssText   = 'background:rgba(100,116,139,0.15);color:#64748b;border:1px solid rgba(100,116,139,0.3);';
+        }
+    } else {
+        const errEl = document.getElementById('profit-pwd-error');
+        const inp   = document.getElementById('profit-pwd-input');
+        errEl.style.display = 'block';
+        inp.style.borderColor = '#ef4444';
+        inp.value = '';
+        setTimeout(() => { inp.style.borderColor = 'rgba(255,255,255,0.08)'; }, 2000);
+    }
+}
+</script>
+</body>
+</html>

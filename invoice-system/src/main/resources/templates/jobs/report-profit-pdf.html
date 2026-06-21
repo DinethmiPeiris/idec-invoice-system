@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Profit Report PDF</title>
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 12mm 10mm 15mm 10mm;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 8pt;
+            color: #000;
+            line-height: 1.35;
+        }
+
+        /* ── Page header ─────────────────────────────── */
+        .doc-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 6mm;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4mm;
+        }
+        .doc-header .company {
+            font-size: 15pt;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .doc-header .report-title {
+            font-size: 11pt;
+            font-weight: bold;
+            margin-top: 1mm;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .doc-header .report-meta {
+            font-size: 8.5pt;
+            color: #444;
+            margin-top: 1mm;
+        }
+
+        /* ── Summary totals row ──────────────────────── */
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6mm;
+        }
+        .summary-table td {
+            width: 33.33%;
+            border: 1px solid #ccc;
+            padding: 3mm 4mm;
+            text-align: center;
+            background: #f7f7f7;
+        }
+        .summary-table .s-label {
+            font-size: 7.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #555;
+        }
+        .summary-table .s-val {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #000;
+            margin-top: 1mm;
+        }
+        .summary-table .green { color: #0f766e; }
+        .summary-table .red { color: #b91c1c; }
+
+        /* ── Main data table ─────────────────────────── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6mm;
+        }
+        .data-table thead th {
+            background: #222;
+            color: #fff;
+            font-size: 7.5pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding: 2.5mm 2mm;
+            border: 1px solid #222;
+            text-align: left;
+        }
+        .data-table tbody td {
+            padding: 2.5mm 2mm;
+            font-size: 8pt;
+            border: 1px solid #eee;
+        }
+        .data-table tbody tr:nth-child(even) td {
+            background: #fafafa;
+        }
+
+        /* Column alignments and formatting */
+        .num { text-align: right; }
+        .green { color: #0f766e; font-weight: bold; }
+        .red { color: #b91c1c; font-weight: bold; }
+
+        /* Totals footer */
+        .data-table tfoot td {
+            padding: 2.5mm 2mm;
+            font-size: 8.5pt;
+            font-weight: bold;
+            background: #f0f0f0;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+        .data-table tfoot td.tf-label {
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="doc-header">
+        <div class="company">IDEC SHIPPING &amp; TRADING (PVT) LTD</div>
+        <div class="report-title">Financial Profit Report</div>
+        <div class="report-meta">
+            Period: <strong th:text="${fromDate}">—</strong> to <strong th:text="${toDate}">—</strong>
+            &nbsp;|&nbsp; Generated on <span th:text="${#temporals.format(#temporals.createNow(), 'dd MMMM yyyy HH:mm')}">—</span>
+        </div>
+    </div>
+
+    <!-- Summary Row -->
+    <table class="summary-table">
+        <tr>
+            <td>
+                <div class="s-label">Total Invoice Amount</div>
+                <div class="s-val" th:text="${#numbers.formatDecimal(totalInvoiceAmount,1,'COMMA',2,'POINT')}">0.00</div>
+            </td>
+            <td>
+                <div class="s-label">Total Expenses</div>
+                <div class="s-val" th:text="${#numbers.formatDecimal(totalExpensesAmount,1,'COMMA',2,'POINT')}">0.00</div>
+            </td>
+            <td>
+                <div class="s-label">Net Profit / Loss</div>
+                <div class="s-val" th:classappend="${totalProfitAmount >= 0 ? 'green' : 'red'}"
+                     th:text="${totalProfitAmount >= 0 ? #numbers.formatDecimal(totalProfitAmount,1,'COMMA',2,'POINT') : '-' + #numbers.formatDecimal(-totalProfitAmount,1,'COMMA',2,'POINT')}">0.00</div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Main Data Table -->
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">#</th>
+                <th style="width: 12%;">Job No</th>
+                <th style="width: 13%;">Date</th>
+                <th style="width: 25%;">Consignee</th>
+                <th style="width: 13%;">TIN No</th>
+                <th style="width: 16%; text-align: right;">Invoice Total</th>
+                <th style="width: 16%; text-align: right;">Total Expenses</th>
+                <th style="width: 16%; text-align: right;">Profit / Loss</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="job, stat : ${jobs}">
+                <td th:text="${stat.count}">1</td>
+                <td style="font-weight: bold;" th:text="${job.jobNo}">—</td>
+                <td th:text="${job.date != null ? #temporals.format(job.date,'dd MMM yyyy') : '—'}">—</td>
+                <td th:text="${job.companyName ?: '—'}">—</td>
+                <td th:text="${job.tempTinNo ?: '—'}">—</td>
+                <td class="num" th:text="${job.blAmount != null ? #numbers.formatDecimal(job.blAmount,1,'COMMA',2,'POINT') : '0.00'}">0.00</td>
+                <td class="num" th:text="${job.tempExpenses != null ? #numbers.formatDecimal(job.tempExpenses,1,'COMMA',2,'POINT') : '0.00'}">0.00</td>
+                <td class="num" th:classappend="${job.tempProfit >= 0 ? 'green' : 'red'}"
+                    th:text="${job.tempProfit >= 0 ? #numbers.formatDecimal(job.tempProfit,1,'COMMA',2,'POINT') : '-' + #numbers.formatDecimal(-job.tempProfit,1,'COMMA',2,'POINT')}">0.00</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5" class="tf-label">TOTALS</td>
+                <td class="num" th:text="${#numbers.formatDecimal(totalInvoiceAmount,1,'COMMA',2,'POINT')}">0.00</td>
+                <td class="num" th:text="${#numbers.formatDecimal(totalExpensesAmount,1,'COMMA',2,'POINT')}">0.00</td>
+                <td class="num" th:classappend="${totalProfitAmount >= 0 ? 'green' : 'red'}"
+                    th:text="${totalProfitAmount >= 0 ? #numbers.formatDecimal(totalProfitAmount,1,'COMMA',2,'POINT') : '-' + #numbers.formatDecimal(-totalProfitAmount,1,'COMMA',2,'POINT')}">0.00</td>
+            </tr>
+        </tfoot>
+    </table>
+
+</body>
+</html>

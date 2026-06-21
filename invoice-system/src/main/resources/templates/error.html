@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title th:text="'IDEC — ' + ${status} + ' ' + ${title}">IDEC — Error</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
+    <style>
+        .error-page { min-height: 100vh; display:flex; align-items:center; justify-content:center; background: var(--navy-deep); }
+        .error-card { max-width: 520px; width:100%; text-align:center; padding: 56px 48px; background: var(--navy-card); border:1px solid rgba(255,255,255,0.07); border-radius: 20px; box-shadow: 0 32px 80px rgba(0,0,0,0.5); }
+        .error-code { font-family:'Outfit',sans-serif; font-size:96px; font-weight:900; line-height:1; background:linear-gradient(135deg,#fff 0%,var(--gold-bright) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:8px; }
+        .error-title { font-family:'Outfit',sans-serif; font-size:26px; font-weight:700; margin-bottom:14px; }
+        .error-desc { font-size:14.5px; color:var(--slate); line-height:1.75; margin-bottom:36px; }
+        .error-db-tip { background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.25); border-radius:10px; padding:16px 20px; margin-bottom:32px; font-size:13px; color:#fbbf24; text-align:left; line-height:1.7; }
+        .error-db-tip strong { display:block; margin-bottom:6px; font-size:13.5px; }
+        .error-db-tip ol { margin-left:18px; }
+        .error-actions { display:flex; gap:12px; justify-content:center; }
+    </style>
+</head>
+<body>
+<div class="error-page">
+    <div class="error-card">
+        <div class="error-code" th:text="${status}">500</div>
+        <div class="error-title" th:text="${title}">Internal Server Error</div>
+        <p class="error-desc" th:text="${desc}">An unexpected error occurred.</p>
+
+        <!-- MongoDB-specific help tip -->
+        <div class="error-db-tip" th:if="${desc != null and #strings.contains(desc, 'MongoDB')}">
+            <strong>⚠️ How to fix the database connection:</strong>
+            <ol>
+                <li>Go to <strong>cloud.mongodb.com</strong> and sign in</li>
+                <li>Click <strong>Network Access</strong> in the left sidebar</li>
+                <li>Click <strong>Add IP Address</strong></li>
+                <li>Click <strong>"Allow Access from Anywhere"</strong> (or add your current IP)</li>
+                <li>Click <strong>Confirm</strong>, then refresh this page</li>
+            </ol>
+        </div>
+
+        <div class="error-actions">
+            <a th:href="@{/dashboard}" class="btn btn-gold">← Go to Dashboard</a>
+            <a href="javascript:location.reload()" class="btn btn-outline">Retry</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

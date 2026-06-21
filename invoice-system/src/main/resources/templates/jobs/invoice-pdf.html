@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Invoice PDF</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 0.6cm 2.8cm 0.6cm 2.8cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 8.5pt;
+            line-height: 1.2;
+            color: #000000;
+        }
+        .header-table {
+            width: 100%;
+            margin-bottom: 2px;
+            border-collapse: collapse;
+        }
+        .header-logo {
+            width: 25%;
+            text-align: left;
+            vertical-align: middle;
+        }
+        .header-logo img {
+            width: 150px;
+        }
+        .header-details {
+            width: 75%;
+            text-align: left;
+            vertical-align: middle;
+            font-size: 8pt;
+            padding-left: 10px;
+        }
+        .header-company {
+            font-family: Castellar, Georgia, Garamond, "Times New Roman", serif;
+            font-weight: bold;
+            font-size: 13pt;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        .title {
+            text-align: center;
+            font-family: Castellar, Georgia, Garamond, "Times New Roman", serif;
+            font-size: 15pt;
+            font-weight: bold;
+            margin-top: 6px;
+            margin-bottom: 6px;
+            letter-spacing: 3px;
+        }
+        .meta-table {
+            width: 100%;
+            margin-bottom: 6px;
+            border-collapse: collapse;
+        }
+        .shipment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border: 2px solid #000000;
+        }
+        .shipment-table td {
+            border: 1px solid #000000;
+            padding: 3px 6px;
+            font-size: 8.5pt;
+            height: 14px;
+            vertical-align: middle;
+        }
+        .shipment-label {
+            width: 20%;
+            text-align: left;
+        }
+        .shipment-val {
+            width: 36%;
+            font-weight: bold;
+            text-align: left;
+        }
+        .shipment-label-sub {
+            width: 19%;
+            text-align: left;
+        }
+        .shipment-val-sub {
+            width: 25%;
+            font-weight: bold;
+            text-align: right;
+        }
+        .charges-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.5px solid #000000;
+        }
+        .charges-table td {
+            padding: 2.2px 12px;
+            font-size: 8.5pt;
+            vertical-align: middle;
+        }
+        .charges-table td.border-right {
+            border-right: 1.5px solid #000000;
+        }
+        .charge-label {
+            text-align: left;
+            width: 75%;
+        }
+        .charge-val {
+            text-align: right;
+            width: 25%;
+            font-weight: bold;
+        }
+        /* Totals section inside the main charges table */
+        .total-divider-row td {
+            border-top: 1.5px solid #000000;
+            padding: 0;
+            height: 0px;
+        }
+        .total-row td {
+            padding: 3px 12px;
+            font-size: 9pt;
+        }
+        .total-row-bottom td {
+            border-bottom: 1.5px solid #000000;
+            padding-bottom: 4px;
+        }
+        .total-label {
+            text-align: right;
+            font-weight: bold;
+            width: 75%;
+        }
+        .total-val {
+            text-align: right;
+            font-weight: bold;
+            width: 25%;
+        }
+        .account-details {
+            margin-top: 12px;
+            font-size: 8.5pt;
+            line-height: 1.35;
+        }
+        .account-title {
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        .footer-thankyou {
+            text-align: center;
+            font-style: italic;
+            font-weight: bold;
+            font-size: 9.5pt;
+            margin-top: 15px;
+            letter-spacing: 1.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <table class="header-table">
+        <tr>
+            <td class="header-logo">
+                <img th:src="${logoBase64}" alt="IDEC LOGO"/>
+            </td>
+            <td class="header-details">
+                <div class="header-company">IDEC SHIPPING AND TRADING (PVT) LTD</div>
+                421/2,Kotte road,pitakotte. Tel: 0113 481481, 0767027255 Web: <span style="white-space: nowrap;">www.idecship.com</span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="title">INVOICE</div>
+
+    <!-- Meta section -->
+    <table class="meta-table">
+        <tr>
+            <td style="width: 60%; vertical-align: top; padding: 0;">
+                <div style="font-size: 9pt; margin-bottom: 8px;">Consignee:</div>
+                <div style="font-weight: bold; font-size: 10.5pt;" th:text="${job.companyName ?: ''}">NAGOYA HOLDINGS</div>
+                <div style="font-size: 9.5pt; margin-top: 1px;" th:if="${companyAddress != null}" th:text="${companyAddress}">Company Address</div>
+            </td>
+            <td style="width: 40%; text-align: right; vertical-align: top; padding: 0; line-height: 1.35;">
+                <div style="font-size: 9.5pt; margin-bottom: 2px;">Date : <span th:text="${job.date != null ? #temporals.format(job.date, 'd/M/yyyy') : ''}">8/5/2026</span></div>
+                <div style="font-size: 9.5pt;">Invoice No: <span th:text="${job.jobNo ?: ''}">52</span></div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Shipment/Job details Table -->
+    <table class="shipment-table">
+        <tr>
+            <td class="shipment-label">Shipper :</td>
+            <td class="shipment-val" th:text="${job.shipper ?: ''}">RONOSAKI</td>
+            <td class="shipment-label-sub">&#160;</td>
+            <td class="shipment-val-sub">0</td>
+        </tr>
+        <tr>
+            <td class="shipment-label">B/L NO:</td>
+            <td class="shipment-val" th:text="${job.blNumber ?: ''}">MOLU18008794509</td>
+            <td class="shipment-label-sub">&#160;</td>
+            <td class="shipment-val-sub">&#160;</td>
+        </tr>
+        <tr>
+            <td class="shipment-label">Vessel :</td>
+            <td class="shipment-val" th:text="${job.vesselName ?: ''}">PROMINENT ACE</td>
+            <td class="shipment-label-sub">&#160;</td>
+            <td class="shipment-val-sub" th:text="${job.deliveryDate != null ? #temporals.format(job.deliveryDate, 'dd/MM/yyyy') : ''}">17/04/2026</td>
+        </tr>
+        <tr>
+            <td class="shipment-label">CHASSIS No:</td>
+            <td class="shipment-val" th:text="${job.chassisContainerNo ?: ''}">MH95S-278428</td>
+            <td class="shipment-label-sub">Entry No:</td>
+            <td class="shipment-val-sub" th:text="${job.customsRegister ?: ''}">24776</td>
+        </tr>
+        <tr>
+            <td class="shipment-label">Goods :</td>
+            <td class="shipment-val" th:text="${job.description ?: ''}">SUZUKI WAGON R</td>
+            <td class="shipment-label-sub">&#160;</td>
+            <td class="shipment-val-sub">&#160;</td>
+        </tr>
+    </table>
+
+    <!-- Charges and Totals Table — ALL rows always present; value shown only when selected -->
+    <table class="charges-table">
+        <!-- 1. D/O Charges -->
+        <tr>
+            <td class="charge-label border-right">D/O Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('doCharges') and job.doCharges != null and job.doCharges > 0
+                           ? #numbers.formatDecimal(job.doCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 2. Custom Duty Amount -->
+        <tr>
+            <td class="charge-label border-right">Custom Duty Amount</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('customDutyAmount') and job.customDutyAmount != null and job.customDutyAmount > 0
+                           ? #numbers.formatDecimal(job.customDutyAmount, 1, 'COMMA', 2, 'POINT') : '.'}">.</td>
+        </tr>
+        <!-- 3. HIPG Charges -->
+        <tr>
+            <td class="charge-label border-right">
+                HIPG Charges <span style="margin-left: 110px;">-</span>
+            </td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('hipgCharges') and job.hipgCharges != null and job.hipgCharges > 0
+                           ? #numbers.formatDecimal(job.hipgCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 4. CICT Charges -->
+        <tr>
+            <td class="charge-label border-right">CICT Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('cictCharges') and job.cictCharges != null and job.cictCharges > 0
+                           ? #numbers.formatDecimal(job.cictCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 5. DO Extension -->
+        <tr>
+            <td class="charge-label border-right">DO Extantion</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('doExtension') and job.doExtension != null and job.doExtension > 0
+                           ? #numbers.formatDecimal(job.doExtension, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 6. Valuation Expenses -->
+        <tr>
+            <td class="charge-label border-right">Valuation Expences</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('valuationExpences') and job.valuationExpences != null and job.valuationExpences > 0
+                           ? #numbers.formatDecimal(job.valuationExpences, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 7. Plant Quarantine -->
+        <tr>
+            <td class="charge-label border-right">Plant Qurantine</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('plantQuarantine') and job.plantQuarantine != null and job.plantQuarantine > 0
+                           ? #numbers.formatDecimal(job.plantQuarantine, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 8. RCT Charges -->
+        <tr>
+            <td class="charge-label border-right">RCT Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('rctCharges') and job.rctCharges != null and job.rctCharges > 0
+                           ? #numbers.formatDecimal(job.rctCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 9. Import Control Debit -->
+        <tr>
+            <td class="charge-label border-right">Import Control</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('importControlDebit') and job.importControlDebit != null and job.importControlDebit > 0
+                           ? #numbers.formatDecimal(job.importControlDebit, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 10. SLPA Bonding Charges -->
+        <tr>
+            <td class="charge-label border-right">SLPA Bonding Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('slpaBondingCharges') and job.slpaBondingCharges != null and job.slpaBondingCharges > 0
+                           ? #numbers.formatDecimal(job.slpaBondingCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 11. Amendment Charges -->
+        <tr>
+            <td class="charge-label border-right">Anmendment Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('amendmentCharges') and job.amendmentCharges != null and job.amendmentCharges > 0
+                           ? #numbers.formatDecimal(job.amendmentCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 12. Handling Expenses -->
+        <tr>
+            <td class="charge-label border-right">Handling Expences</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('handlingExpenses') and job.handlingExpenses != null and job.handlingExpenses > 0
+                           ? #numbers.formatDecimal(job.handlingExpenses, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 13. Documentation Expenses -->
+        <tr>
+            <td class="charge-label border-right">Documantation Expences</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('documentationExpences') and job.documentationExpences != null and job.documentationExpences > 0
+                           ? #numbers.formatDecimal(job.documentationExpences, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 14. Examination -->
+        <tr>
+            <td class="charge-label border-right">Examination</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('examination') and job.examination != null and job.examination > 0
+                           ? #numbers.formatDecimal(job.examination, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 15. Weigh Bridge Charges -->
+        <tr>
+            <td class="charge-label border-right">Weigh bridge Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('weighBridgeCharges') and job.weighBridgeCharges != null and job.weighBridgeCharges > 0
+                           ? #numbers.formatDecimal(job.weighBridgeCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 16. Labour -->
+        <tr>
+            <td class="charge-label border-right">Labour</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('labour') and job.labour != null and job.labour > 0
+                           ? #numbers.formatDecimal(job.labour, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 17. Additional ex TIN -->
+        <tr>
+            <td class="charge-label border-right">Additional</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('additional') and job.additional != null and job.additional > 0
+                           ? #numbers.formatDecimal(job.additional, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 18. VAT Registration Ex -->
+        <tr>
+            <td class="charge-label border-right">VAT Registration</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('vatRegistration') and job.vatRegistration != null and job.vatRegistration > 0
+                           ? #numbers.formatDecimal(job.vatRegistration, 1, 'COMMA', 2, 'POINT') : '&#160;'}">&#160;</td>
+        </tr>
+        <!-- 19. Trade Registration Ex -->
+        <tr>
+            <td class="charge-label border-right">Trade Registration</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('tradeRegistration') and job.tradeRegistration != null and job.tradeRegistration > 0
+                           ? #numbers.formatDecimal(job.tradeRegistration, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 20. Transport -->
+        <tr>
+            <td class="charge-label border-right">Transport</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('transport') and job.transport != null and job.transport > 0
+                           ? #numbers.formatDecimal(job.transport, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 21. Other Charges -->
+        <tr>
+            <td class="charge-label border-right">Other Charges</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('other') and job.other != null and job.other > 0
+                           ? #numbers.formatDecimal(job.other, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- 22. Agency Fee -->
+        <tr>
+            <td class="charge-label border-right">Agency Fee</td>
+            <td class="charge-val"
+                th:text="${selectedCharges.contains('agencyFee') and job.agencyFee != null and job.agencyFee > 0
+                           ? #numbers.formatDecimal(job.agencyFee, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+
+        <!-- Custom Charge -->
+        <tr th:if="${selectedCharges.contains('customChargeValue') and job.customChargeName != null and !job.customChargeName.isBlank() and job.customChargeValue != null and job.customChargeValue > 0}">
+            <td class="charge-label border-right" th:text="${job.customChargeName}">Custom Charge</td>
+            <td class="charge-val" th:text="${#numbers.formatDecimal(job.customChargeValue, 1, 'COMMA', 2, 'POINT')}">0.00</td>
+        </tr>
+
+        <!-- Table Totals Divider -->
+        <tr class="total-divider-row">
+            <td class="border-right"></td>
+            <td></td>
+        </tr>
+
+        <!-- Total Amount Row -->
+        <tr class="total-row">
+            <td class="total-label border-right">Total Amount Rs:</td>
+            <td class="total-val" th:text="${job.blAmount != null ? #numbers.formatDecimal(job.blAmount, 1, 'COMMA', 2, 'POINT') : '0.00'}">89,781.23</td>
+        </tr>
+        <!-- Advance Row -->
+        <tr class="total-row">
+            <td class="total-label border-right">Advance Rs:</td>
+            <td class="total-val" th:text="${job.advance != null and job.advance > 0 ? #numbers.formatDecimal(job.advance, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
+        </tr>
+        <!-- Balance Row -->
+        <tr class="total-row total-row-bottom">
+            <td class="total-label border-right">Balance Rs:</td>
+            <td class="total-val" th:text="${job.balance != null ? #numbers.formatDecimal(job.balance, 1, 'COMMA', 2, 'POINT') : '0.00'}">89,781.23</td>
+        </tr>
+    </table>
+
+    <!-- Account Details -->
+    <div class="account-details" style="font-family: Georgia, serif; line-height: 1.4; font-size: 9.5pt;">
+        <div class="account-title" style="font-weight: bold;">Account details :</div>
+        IDEC Shipping and Trading (Pvt) Ltd<br/>
+        Commercial Bank<br/>
+        <span style="font-style: italic;">City Office</span><br/>
+        <span style="font-style: italic;">A/C No: 1000691960</span>
+    </div>
+
+    <!-- Thank you footer -->
+    <div class="footer-thankyou" style="font-family: Georgia, serif; font-style: italic; font-weight: bold; font-size: 10.5pt; text-align: center; margin-top: 18px; letter-spacing: 1px;">
+        THANK YOU FOR YOUR BUSINESS
+    </div>
+
+</body>
+</html>
