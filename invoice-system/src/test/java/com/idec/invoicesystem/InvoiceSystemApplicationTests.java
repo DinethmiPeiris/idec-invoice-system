@@ -170,6 +170,52 @@ class InvoiceSystemApplicationTests {
         }
         java.nio.file.Files.write(java.nio.file.Paths.get("invoice-system/target/test_summary_report.pdf"), pdfBytes);
     }
+
+    @Test
+    void testJobSheetPdfGeneration() throws Exception {
+        Context context = new Context();
+        com.idec.invoicesystem.model.Job job = new com.idec.invoicesystem.model.Job();
+        job.setJobNo("137 V");
+        job.setCompanyName("N P WICKRAMASINGHE");
+        job.setVesselName("TURANDOT OF V704");
+        job.setDate(java.time.LocalDate.of(2026, 6, 19));
+        job.setChassisContainerNo("LA350S-0457276");
+        job.setBlNumber("SBHBS714NB007");
+        job.setDescription("USED DAIHATSU MIRA ES PETROL CAR");
+        context.setVariable("job", job);
+
+        byte[] pdfBytes = pdfService.generatePdf("jobs/job-sheet-pdf", context);
+        assertNotNull(pdfBytes);
+
+        java.io.File targetDir = new java.io.File("invoice-system/target");
+        if (!targetDir.exists()) {
+            targetDir.mkdirs();
+        }
+        java.nio.file.Files.write(java.nio.file.Paths.get("invoice-system/target/test_job_sheet.pdf"), pdfBytes);
+    }
+
+    @Test
+    void testNextJobNoLogic() {
+        com.idec.invoicesystem.repository.JobRepository mockRepo = org.mockito.Mockito.mock(com.idec.invoicesystem.repository.JobRepository.class);
+        com.idec.invoicesystem.service.JobService service = new com.idec.invoicesystem.service.JobService();
+        org.springframework.test.util.ReflectionTestUtils.setField(service, "jobRepository", mockRepo);
+
+        // 1. When empty, should start from 001
+        org.mockito.Mockito.when(mockRepo.findAllByOrderByCreatedAtDesc()).thenReturn(java.util.Collections.emptyList());
+        org.junit.jupiter.api.Assertions.assertEquals("001", service.getNextJobNo());
+
+        // 2. When has jobs, should increment and format as 3-digit
+        com.idec.invoicesystem.model.Job job = new com.idec.invoicesystem.model.Job();
+        job.setJobNo("001");
+        org.mockito.Mockito.when(mockRepo.findAllByOrderByCreatedAtDesc()).thenReturn(java.util.Collections.singletonList(job));
+        org.junit.jupiter.api.Assertions.assertEquals("002", service.getNextJobNo());
+
+        // 3. When has 100, should increment to 101
+        com.idec.invoicesystem.model.Job job2 = new com.idec.invoicesystem.model.Job();
+        job2.setJobNo("100");
+        org.mockito.Mockito.when(mockRepo.findAllByOrderByCreatedAtDesc()).thenReturn(java.util.Collections.singletonList(job2));
+        org.junit.jupiter.api.Assertions.assertEquals("101", service.getNextJobNo());
+    }
 }
 
 

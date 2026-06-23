@@ -88,9 +88,9 @@ public class JobService {
     public String getNextJobNo() {
         List<Job> latestJobs = jobRepository.findAllByOrderByCreatedAtDesc();
         if (latestJobs.isEmpty()) {
-            return "1001";
+            return "001";
         }
-        int maxNo = 1000;
+        int maxNo = 0;
         boolean foundNumeric = false;
         for (Job j : latestJobs) {
             String jNo = j.getJobNo();
@@ -105,13 +105,13 @@ public class JobService {
             }
         }
         if (foundNumeric) {
-            return String.valueOf(maxNo + 1);
+            return String.format("%03d", maxNo + 1);
         } else {
             String lastJobNo = latestJobs.get(0).getJobNo();
             try {
-                return String.valueOf(Integer.parseInt(lastJobNo.trim()) + 1);
+                return String.format("%03d", Integer.parseInt(lastJobNo.trim()) + 1);
             } catch (NumberFormatException e) {
-                return "1001";
+                return "001";
             }
         }
     }

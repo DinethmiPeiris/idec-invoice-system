@@ -178,7 +178,7 @@
                 <div style="font-size: 9.5pt; margin-top: 1px;" th:if="${companyAddress != null}" th:text="${companyAddress}">Company Address</div>
             </td>
             <td style="width: 40%; text-align: right; vertical-align: top; padding: 0; line-height: 1.35;">
-                <div style="font-size: 9.5pt; margin-bottom: 2px;">Date : <span th:text="${job.date != null ? #temporals.format(job.date, 'd/M/yyyy') : ''}">8/5/2026</span></div>
+                <div style="font-size: 9.5pt; margin-bottom: 2px;">Date : <span th:text="${job.deliveryDate != null ? #temporals.format(job.deliveryDate, 'd/M/yyyy') : ''}">8/5/2026</span></div>
                 <div style="font-size: 9.5pt;">Invoice No: <span th:text="${job.jobNo ?: ''}">52</span></div>
             </td>
         </tr>
@@ -201,7 +201,7 @@
         <tr>
             <td class="shipment-label">Vessel :</td>
             <td class="shipment-val" th:text="${job.vesselName ?: ''}">PROMINENT ACE</td>
-            <td class="shipment-label-sub">&#160;</td>
+            <td class="shipment-label-sub">Vessel Date:</td>
             <td class="shipment-val-sub" th:text="${job.deliveryDate != null ? #temporals.format(job.deliveryDate, 'dd/MM/yyyy') : ''}">17/04/2026</td>
         </tr>
         <tr>

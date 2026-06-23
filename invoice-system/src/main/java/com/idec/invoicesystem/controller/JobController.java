@@ -682,6 +682,31 @@ public class JobController {
         }
     }
 
+    // ── Generate Job Sheet PDF ───────────────────────────────────────────────
+    @GetMapping("/job-sheet/{id}")
+    public ResponseEntity<byte[]> generateJobSheet(@PathVariable String id) {
+        Optional<Job> jobOpt = jobService.getJobById(id);
+        if (jobOpt.isEmpty()) return ResponseEntity.notFound().build();
+        Job job = jobOpt.get();
+
+        try {
+            org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+            context.setVariable("job", job);
+
+            byte[] pdfBytes = pdfService.generatePdf("jobs/job-sheet-pdf", context);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.inline()
+                    .filename("JobSheet_" + job.getJobNo() + ".pdf")
+                    .build());
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     // ── Helper ───────────────────────────────────────────────────────────────
     private Double orZero(Double val) {
         return val != null ? val : 0.0;
