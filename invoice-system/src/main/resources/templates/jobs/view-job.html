@@ -96,9 +96,15 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Job Sheet
                 </a>
-                <a th:if="${isAdmin}" th:href="@{/jobs/invoice/{id}(id=${job.id})}" class="btn btn-gold" target="_blank">
+                <a th:if="${isAdmin}"
+                   th:id="'gen-invoice-btn'"
+                   th:href="@{/jobs/invoice/{id}(id=${job.id})}"
+                   th:class="${job.invoiceGenerated or job.status == 'COMPLETED'} ? 'btn' : 'btn btn-gold'"
+                   th:style="${job.invoiceGenerated or job.status == 'COMPLETED'} ? 'background: rgba(255, 255, 255, 0.04); border: 1.5px dashed rgba(255, 255, 255, 0.15); color: rgba(255, 255, 255, 0.4); cursor: pointer;' : ''"
+                   th:onclick="${job.invoiceGenerated or job.status == 'COMPLETED'} ? 'return handleGenerateInvoice(event, this)' : ''"
+                   target="_blank">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    Generate Invoice
+                    <span id="gen-btn-text" th:text="${job.invoiceGenerated or job.status == 'COMPLETED'} ? 'Generate Invoice 🔒' : 'Generate Invoice'">Generate Invoice</span>
                 </a>
                 <a th:href="@{/jobs}" class="btn btn-outline">← Back</a>
             </div>
@@ -140,13 +146,24 @@
 
             <!-- Section A -->
             <div class="form-section" style="margin-bottom:16px;">
-                <div class="form-section-header">
-                    <div class="form-section-icon icon-blue">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <div class="form-section-header" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="form-section-icon icon-blue">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        </div>
+                        <div>
+                            <div class="form-section-title">A — Job Information</div>
+                        </div>
                     </div>
-                    <div>
-                        <div class="form-section-title">A — Job Information</div>
-                    </div>
+                    
+                    <a th:if="${isAdmin and (job.invoiceGenerated or job.status == 'COMPLETED')}"
+                       th:href="@{/jobs/invoice/{id}/pdf(id=${job.id})}"
+                       class="btn btn-outline"
+                       target="_blank"
+                       style="border-color: #2ecc71; color: #2ecc71; background: rgba(46, 204, 113, 0.08); padding: 10px 20px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; text-decoration: none; border-radius: 8px; transition: all 0.2s ease;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        View Invoice
+                    </a>
                 </div>
                 <div class="detail-grid">
                     <div class="detail-item"><div class="detail-label">Job No</div><div class="detail-value" th:text="${job.jobNo}">—</div></div>
@@ -386,6 +403,28 @@ function verifyProfitPassword() {
         inp.value = '';
         setTimeout(() => { inp.style.borderColor = 'rgba(255,255,255,0.08)'; }, 2000);
     }
+}
+
+function handleGenerateInvoice(event, element) {
+    event.preventDefault();
+    const code = prompt("This invoice has already been generated. Enter authorization code to modify/regenerate:");
+    if (code === "1234") {
+        // Unlocks styling
+        element.style.background = "";
+        element.style.border = "";
+        element.style.color = "";
+        element.className = "btn btn-gold";
+        
+        const btnText = document.getElementById("gen-btn-text");
+        if (btnText) {
+            btnText.textContent = "Generate Invoice 🔓";
+        }
+        element.onclick = null; // remove the onclick interceptor
+        window.open(element.href, '_blank');
+    } else if (code !== null) {
+        alert("Incorrect authorization code!");
+    }
+    return false;
 }
 </script>
 </body>

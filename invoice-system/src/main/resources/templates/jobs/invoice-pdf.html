@@ -224,15 +224,15 @@
         <tr>
             <td class="charge-label border-right">D/O Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('doCharges') and job.doCharges != null and job.doCharges > 0
+                th:text="${job.doCharges != null and job.doCharges > 0
                            ? #numbers.formatDecimal(job.doCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 2. Custom Duty Amount -->
         <tr>
             <td class="charge-label border-right">Custom Duty Amount</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('customDutyAmount') and job.customDutyAmount != null and job.customDutyAmount > 0
-                           ? #numbers.formatDecimal(job.customDutyAmount, 1, 'COMMA', 2, 'POINT') : '.'}">.</td>
+                th:text="${job.customDutyAmount != null and job.customDutyAmount > 0
+                           ? #numbers.formatDecimal(job.customDutyAmount, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 3. HIPG Charges -->
         <tr>
@@ -240,140 +240,140 @@
                 HIPG Charges <span style="margin-left: 110px;">-</span>
             </td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('hipgCharges') and job.hipgCharges != null and job.hipgCharges > 0
+                th:text="${job.hipgCharges != null and job.hipgCharges > 0
                            ? #numbers.formatDecimal(job.hipgCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 4. CICT Charges -->
         <tr>
             <td class="charge-label border-right">CICT Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('cictCharges') and job.cictCharges != null and job.cictCharges > 0
+                th:text="${job.cictCharges != null and job.cictCharges > 0
                            ? #numbers.formatDecimal(job.cictCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 5. DO Extension -->
         <tr>
             <td class="charge-label border-right">DO Extantion</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('doExtension') and job.doExtension != null and job.doExtension > 0
+                th:text="${job.doExtension != null and job.doExtension > 0
                            ? #numbers.formatDecimal(job.doExtension, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 6. Valuation Expenses -->
         <tr>
             <td class="charge-label border-right">Valuation Expences</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('valuationExpences') and job.valuationExpences != null and job.valuationExpences > 0
+                th:text="${job.valuationExpences != null and job.valuationExpences > 0
                            ? #numbers.formatDecimal(job.valuationExpences, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 7. Plant Quarantine -->
         <tr>
             <td class="charge-label border-right">Plant Qurantine</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('plantQuarantine') and job.plantQuarantine != null and job.plantQuarantine > 0
+                th:text="${job.plantQuarantine != null and job.plantQuarantine > 0
                            ? #numbers.formatDecimal(job.plantQuarantine, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 8. RCT Charges -->
         <tr>
             <td class="charge-label border-right">RCT Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('rctCharges') and job.rctCharges != null and job.rctCharges > 0
+                th:text="${job.rctCharges != null and job.rctCharges > 0
                            ? #numbers.formatDecimal(job.rctCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 9. Import Control Debit -->
         <tr>
             <td class="charge-label border-right">Import Control</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('importControlDebit') and job.importControlDebit != null and job.importControlDebit > 0
+                th:text="${job.importControlDebit != null and job.importControlDebit > 0
                            ? #numbers.formatDecimal(job.importControlDebit, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 10. SLPA Bonding Charges -->
         <tr>
             <td class="charge-label border-right">SLPA Bonding Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('slpaBondingCharges') and job.slpaBondingCharges != null and job.slpaBondingCharges > 0
+                th:text="${job.slpaBondingCharges != null and job.slpaBondingCharges > 0
                            ? #numbers.formatDecimal(job.slpaBondingCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 11. Amendment Charges -->
         <tr>
             <td class="charge-label border-right">Anmendment Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('amendmentCharges') and job.amendmentCharges != null and job.amendmentCharges > 0
+                th:text="${job.amendmentCharges != null and job.amendmentCharges > 0
                            ? #numbers.formatDecimal(job.amendmentCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 12. Handling Expenses -->
         <tr>
             <td class="charge-label border-right">Handling Expences</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('handlingExpenses') and job.handlingExpenses != null and job.handlingExpenses > 0
+                th:text="${job.handlingExpenses != null and job.handlingExpenses > 0
                            ? #numbers.formatDecimal(job.handlingExpenses, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 13. Documentation Expenses -->
         <tr>
             <td class="charge-label border-right">Documantation Expences</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('documentationExpences') and job.documentationExpences != null and job.documentationExpences > 0
+                th:text="${job.documentationExpences != null and job.documentationExpences > 0
                            ? #numbers.formatDecimal(job.documentationExpences, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 14. Examination -->
         <tr>
             <td class="charge-label border-right">Examination</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('examination') and job.examination != null and job.examination > 0
+                th:text="${job.examination != null and job.examination > 0
                            ? #numbers.formatDecimal(job.examination, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 15. Weigh Bridge Charges -->
         <tr>
             <td class="charge-label border-right">Weigh bridge Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('weighBridgeCharges') and job.weighBridgeCharges != null and job.weighBridgeCharges > 0
+                th:text="${job.weighBridgeCharges != null and job.weighBridgeCharges > 0
                            ? #numbers.formatDecimal(job.weighBridgeCharges, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 16. Labour -->
         <tr>
             <td class="charge-label border-right">Labour</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('labour') and job.labour != null and job.labour > 0
+                th:text="${job.labour != null and job.labour > 0
                            ? #numbers.formatDecimal(job.labour, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 17. Additional ex TIN -->
         <tr>
             <td class="charge-label border-right">Additional</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('additional') and job.additional != null and job.additional > 0
+                th:text="${job.additional != null and job.additional > 0
                            ? #numbers.formatDecimal(job.additional, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 18. VAT Registration Ex -->
         <tr>
             <td class="charge-label border-right">VAT Registration</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('vatRegistration') and job.vatRegistration != null and job.vatRegistration > 0
-                           ? #numbers.formatDecimal(job.vatRegistration, 1, 'COMMA', 2, 'POINT') : '&#160;'}">&#160;</td>
+                th:text="${job.vatRegistration != null and job.vatRegistration > 0
+                           ? #numbers.formatDecimal(job.vatRegistration, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 19. Trade Registration Ex -->
         <tr>
             <td class="charge-label border-right">Trade Registration</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('tradeRegistration') and job.tradeRegistration != null and job.tradeRegistration > 0
+                th:text="${job.tradeRegistration != null and job.tradeRegistration > 0
                            ? #numbers.formatDecimal(job.tradeRegistration, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 20. Transport -->
         <tr>
             <td class="charge-label border-right">Transport</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('transport') and job.transport != null and job.transport > 0
+                th:text="${job.transport != null and job.transport > 0
                            ? #numbers.formatDecimal(job.transport, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 21. Other Charges -->
         <tr>
             <td class="charge-label border-right">Other Charges</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('other') and job.other != null and job.other > 0
+                th:text="${job.other != null and job.other > 0
                            ? #numbers.formatDecimal(job.other, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
         <!-- 22. Agency Fee -->
         <tr>
             <td class="charge-label border-right">Agency Fee</td>
             <td class="charge-val"
-                th:text="${selectedCharges.contains('agencyFee') and job.agencyFee != null and job.agencyFee > 0
+                th:text="${job.agencyFee != null and job.agencyFee > 0
                            ? #numbers.formatDecimal(job.agencyFee, 1, 'COMMA', 2, 'POINT') : '-'}">-</td>
         </tr>
 

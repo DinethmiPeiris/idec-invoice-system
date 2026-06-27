@@ -25,8 +25,8 @@ public class DashboardController {
             model.addAttribute("inProgressJobs", jobService.getInProgressJobs());
             model.addAttribute("completedJobs",  jobService.getCompletedJobs());
             model.addAttribute("totalBlAmount",  jobService.getTotalBlAmount());
-            model.addAttribute("totalAdvance",   jobService.getTotalAdvance());
-            model.addAttribute("totalBalance",   jobService.getTotalBalance());
+            model.addAttribute("totalPaidInvoices", jobService.getTotalPaidInvoices());
+            model.addAttribute("totalBalancePending", jobService.getTotalBalancePending());
             model.addAttribute("invoicePaidJobsCount",    jobService.getInvoicePaidJobsCount());
             model.addAttribute("invoicePendingJobsCount", jobService.getInvoicePendingJobsCount());
             model.addAttribute("recentJobs",     jobService.getAllJobs().stream().limit(10).toList());
@@ -37,8 +37,8 @@ public class DashboardController {
             model.addAttribute("inProgressJobs", 0L);
             model.addAttribute("completedJobs",  0L);
             model.addAttribute("totalBlAmount",  0.0);
-            model.addAttribute("totalAdvance",   0.0);
-            model.addAttribute("totalBalance",   0.0);
+            model.addAttribute("totalPaidInvoices", 0.0);
+            model.addAttribute("totalBalancePending", 0.0);
             model.addAttribute("invoicePaidJobsCount",    0L);
             model.addAttribute("invoicePendingJobsCount", 0L);
             model.addAttribute("recentJobs",     List.of());

@@ -12,8 +12,8 @@ public interface JobRepository extends MongoRepository<Job, String> {
     List<Job> findByStatus(String status);
     List<Job> findByCompanyIdOrderByCreatedAtDesc(String companyId);
     List<Job> findAllByOrderByCreatedAtDesc();
-    List<Job> findByJobNoContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-            String jobNo, String companyName, String description);
+    List<Job> findByJobNoContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrRemarksContainingIgnoreCase(
+            String jobNo, String companyName, String description, String remarks);
     long countByStatus(String status);
     List<Job> findByInvoiceStatus(String invoiceStatus);
     long countByInvoiceStatus(String invoiceStatus);

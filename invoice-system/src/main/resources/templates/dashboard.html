@@ -180,8 +180,8 @@
 
                 <div class="stat-card" th:if="${isAdmin}">
                     <div class="stat-card-left">
-                        <span class="stat-card-label">Advance Collected</span>
-                        <span class="stat-card-value" th:text="'LKR ' + ${#numbers.formatDecimal(totalAdvance, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</span>
+                        <span class="stat-card-label">Total Paid Invoices</span>
+                        <span class="stat-card-value" th:text="'LKR ' + ${#numbers.formatDecimal(totalPaidInvoices, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</span>
                         <span class="stat-card-sub">Payments received</span>
                     </div>
                     <div class="stat-card-icon icon-green">
@@ -192,7 +192,7 @@
                 <div class="stat-card" th:if="${isAdmin}">
                     <div class="stat-card-left">
                         <span class="stat-card-label">Balance Pending</span>
-                        <span class="stat-card-value" th:text="'LKR ' + ${#numbers.formatDecimal(totalBalance, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</span>
+                        <span class="stat-card-value" th:text="'LKR ' + ${#numbers.formatDecimal(totalBalancePending, 1, 'COMMA', 2, 'POINT')}">LKR 0.00</span>
                         <span class="stat-card-sub">Outstanding</span>
                     </div>
                     <div class="stat-card-icon icon-yellow">
@@ -333,12 +333,20 @@
                                           th:text="${job.status == 'IN_PROGRESS'} ? 'In Progress' : ${#strings.capitalize(#strings.toLowerCase(job.status))}">
                                     </span>
                                 </td>
-                                <td>
-                                    <div style="display:flex;gap:6px;">
-                                        <a th:href="@{/jobs/view/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="View">
-                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                                        </a>
-                                        <a th:href="@{/jobs/edit/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="Edit">
+                                 <td>
+                                     <div style="display:flex;gap:6px;align-items:center;">
+                                         <a th:if="${isAdmin and (job.invoiceGenerated or job.status == 'COMPLETED')}"
+                                            th:href="@{/jobs/invoice/{id}/pdf(id=${job.id})}"
+                                            class="btn btn-outline btn-sm btn-icon"
+                                            title="View Invoice"
+                                            target="_blank"
+                                            style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background: rgba(46, 204, 113, 0.05);">
+                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                         </a>
+                                         <a th:href="@{/jobs/view/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="View">
+                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                         </a>
+                                         <a th:href="@{/jobs/edit/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="Edit">
                                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                         </a>
                                     </div>

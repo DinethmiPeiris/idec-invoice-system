@@ -612,16 +612,14 @@ public class JobController {
         if (jobOpt.isEmpty()) return ResponseEntity.notFound().build();
         Job job = jobOpt.get();
 
-        // Save ONLY the totals, status and timestamp to MongoDB
+        // Save the totals, status, individual charges, selected charges, and timestamp to MongoDB
         job.setBlAmount(orZero(form.getBlAmount()));
         job.setAdvance(orZero(form.getAdvance()));
         job.setBalance(orZero(form.getBalance()));
         job.setStatus("COMPLETED");
-        job.setUpdatedAt(LocalDateTime.now());
-        jobService.saveJob(job);
-
-        // Load the Admin's edited charge values onto the job object in-memory (do not save to DB)
-        // so they are available for PDF generation:
+        job.setInvoiceGenerated(true);
+        job.setSelectedCharges(form.getSelectedCharges() != null ? form.getSelectedCharges() : new java.util.HashSet<>());
+        
         job.setDoCharges(orZero(form.getDoCharges()));
         job.setCustomDutyAmount(orZero(form.getCustomDutyAmount()));
         job.setHipgCharges(orZero(form.getHipgCharges()));
@@ -646,6 +644,9 @@ public class JobController {
         job.setAgencyFee(orZero(form.getAgencyFee()));
         job.setCustomChargeName(form.getCustomChargeName());
         job.setCustomChargeValue(orZero(form.getCustomChargeValue()));
+
+        job.setUpdatedAt(LocalDateTime.now());
+        jobService.saveJob(job);
 
         try {
             ClassPathResource imgResource = new ClassPathResource("static/idec-logo.png");
@@ -699,6 +700,51 @@ public class JobController {
             headers.setContentType(MediaType.APPLICATION_PDF);
             headers.setContentDisposition(ContentDisposition.inline()
                     .filename("JobSheet_" + job.getJobNo() + ".pdf")
+                    .build());
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    // ── View Invoice PDF (Admin Only) ─────────────────────────────────────────
+    @GetMapping("/invoice/{id}/pdf")
+    public ResponseEntity<byte[]> viewInvoicePdf(@PathVariable String id, Authentication auth) {
+        boolean isAdmin = auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (!isAdmin) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        Optional<Job> jobOpt = jobService.getJobById(id);
+        if (jobOpt.isEmpty()) return ResponseEntity.notFound().build();
+        Job job = jobOpt.get();
+
+        try {
+            ClassPathResource imgResource = new ClassPathResource("static/idec-logo.png");
+            byte[] imageBytes = StreamUtils.copyToByteArray(imgResource.getInputStream());
+            String logoBase64 = "data:image/png;base64," + Base64.getEncoder().encodeToString(imageBytes);
+
+            Set<String> selected = job.getSelectedCharges() != null
+                    ? job.getSelectedCharges()
+                    : new java.util.HashSet<>();
+
+            org.thymeleaf.context.Context context = new org.thymeleaf.context.Context();
+            context.setVariable("job", job);
+            context.setVariable("logoBase64", logoBase64);
+            context.setVariable("selectedCharges", selected);
+
+            if (job.getCompanyId() != null && !job.getCompanyId().isBlank()) {
+                companyService.getCompanyById(job.getCompanyId()).ifPresent(company -> {
+                    context.setVariable("companyAddress", company.getAddress());
+                });
+            }
+
+            byte[] pdfBytes = pdfService.generatePdf("jobs/invoice-pdf", context);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.inline()
+                    .filename("Invoice_" + job.getJobNo() + ".pdf")
                     .build());
             return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
         } catch (Exception e) {

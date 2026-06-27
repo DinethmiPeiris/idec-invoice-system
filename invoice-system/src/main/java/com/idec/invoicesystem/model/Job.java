@@ -76,6 +76,8 @@ public class Job {
     private Double blAmount               = 0.0;
     private Double advance                = 0.0;
     private Double balance                = 0.0;
+    private Boolean invoiceGenerated      = false;
+    private java.util.Set<String> selectedCharges = new java.util.HashSet<>();
 
     // ── Status ───────────────────────────────────────────────────
     private String status = "PENDING"; // PENDING / IN_PROGRESS / COMPLETED

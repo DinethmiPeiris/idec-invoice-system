@@ -38,8 +38,8 @@ public class JobService {
 
     public List<Job> searchJobs(String query) {
         return jobRepository
-                .findByJobNoContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                        query, query, query);
+                .findByJobNoContainingIgnoreCaseOrCompanyNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrRemarksContainingIgnoreCase(
+                        query, query, query, query);
     }
 
     public List<Job> getJobsByStatus(String status) {
@@ -83,6 +83,17 @@ public class JobService {
         return jobRepository.findAll().stream()
                 .mapToDouble(j -> j.getBalance() != null ? j.getBalance() : 0.0)
                 .sum();
+    }
+
+    public double getTotalPaidInvoices() {
+        return jobRepository.findAll().stream()
+                .filter(j -> "PAID".equals(j.getInvoiceStatus()))
+                .mapToDouble(j -> j.getBlAmount() != null ? j.getBlAmount() : 0.0)
+                .sum();
+    }
+
+    public double getTotalBalancePending() {
+        return getTotalBlAmount() - getTotalPaidInvoices();
     }
 
     public String getNextJobNo() {
