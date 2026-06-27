@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1df6ee12-1a58-4aa0-a683-a033fdf71f5b" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;IT24101204&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/DinethmiPeiris/idec-invoice-system.git&quot;,
+    &quot;accountId&quot;: &quot;74e68009-64b4-476c-b972-6f30e15197e2&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3F1UCUJu1Ws4ofTaSEdz5X48eky" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot.InvoiceSystemApplication.executor": "Run",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/thinu/OneDrive - Sri Lanka Institute of Information Technology/idec-invoice-system",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Facets",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "configurable.group.build",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration name="InvoiceSystemApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="invoice-system" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.idec.invoicesystem.InvoiceSystemApplication" />
+      <option name="VM_PARAMETERS" value="-Djava.naming.provider.url=dns://8.8.8.8" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.24374.151" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1df6ee12-1a58-4aa0-a683-a033fdf71f5b" name="Changes" comment="" />
+      <created>1781241941780</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1781241941780</updated>
+      <workItem from="1781241942991" duration="1590000" />
+      <workItem from="1781244713177" duration="3643000" />
+      <workItem from="1781444975949" duration="1108000" />
+      <workItem from="1781614680698" duration="4918000" />
+      <workItem from="1781633812106" duration="2566000" />
+      <workItem from="1781673683620" duration="1206000" />
+      <workItem from="1781674916338" duration="1848000" />
+      <workItem from="1781693378985" duration="8941000" />
+      <workItem from="1781761361920" duration="1589000" />
+      <workItem from="1781787410332" duration="3111000" />
+      <workItem from="1781849238455" duration="2052000" />
+      <workItem from="1781886038944" duration="10000" />
+      <workItem from="1781886075333" duration="638000" />
+      <workItem from="1781935532805" duration="312000" />
+      <workItem from="1781944728199" duration="2286000" />
+      <workItem from="1782013174712" duration="6829000" />
+      <workItem from="1782056748027" duration="5000" />
+      <workItem from="1782056767255" duration="654000" />
+      <workItem from="1782104751713" duration="8905000" />
+      <workItem from="1782221334148" duration="657000" />
+      <workItem from="1782399486109" duration="130000" />
+      <workItem from="1782454526142" duration="1327000" />
+      <workItem from="1782479127895" duration="1194000" />
+      <workItem from="1782532722029" duration="301000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

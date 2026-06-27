@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title th:text="${invoiceStatusFilter == 'PAID'} ? 'IDEC — Paid Invoices' : (${invoiceStatusFilter == 'PENDING'} ? 'IDEC — Pending Invoices' : 'IDEC — All Jobs')">IDEC — All Jobs</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}"/>
+</head>
+<body>
+<div class="app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-name">IDEC</div>
+            <div class="brand-sub">Shipping &amp; Trading (PVT) LTD</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Main</div>
+            <a th:href="@{/dashboard}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Overview
+            </a>
+            <div th:unless="${isAdmin}" class="nav-section-label">Jobs</div>
+            <a th:unless="${isAdmin}" th:href="@{/jobs/add}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Add New Job
+            </a>
+            <a th:href="@{/jobs}" class="nav-link" th:classappend="${invoiceStatusFilter == null} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                All Jobs
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs(invoiceStatus='PAID')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PAID'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span>Paid Invoices</span>
+                <span class="badge badge-done" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePaidJobsCount}">0</span>
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs(invoiceStatus='PENDING')}" class="nav-link" th:classappend="${invoiceStatusFilter == 'PENDING'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Pending Invoices</span>
+                <span class="badge badge-pending" style="margin-left: auto; font-size: 10px; padding: 2px 6px; border-radius: 4px;" th:text="${invoicePendingJobsCount}">0</span>
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Summary Report
+            </a>
+            <a th:if="${isAdmin}" th:href="@{/jobs/report/profit}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                Profit Report
+            </a>
+            <div class="nav-section-label">Settings</div>
+            <a th:href="@{/companies}" class="nav-link">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                Manage Congsigunes
+            </a>
+
+            <a th:if="${isAdmin}" th:href="@{/change-password}" class="nav-link" th:classappend="${activePage == 'change-password'} ? 'active'">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Change Password
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="user-pill">
+                <div class="user-avatar" th:text="${#strings.substring(username,0,1).toUpperCase()}">A</div>
+                <div>
+                    <div class="user-name" th:text="${username}">admin</div>
+                    <div class="user-role" th:text="${userRole}">Administrator</div>
+                </div>
+            </div>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="nav-link" style="width:100%">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="topbar">
+            <div class="topbar-title" th:text="${invoiceStatusFilter == 'PAID'} ? 'Paid Invoices' : (${invoiceStatusFilter == 'PENDING'} ? 'Pending Invoices' : 'All Jobs')">All Jobs</div>
+            <div class="topbar-right">
+                <div id="dash-clock" class="topbar-clock">--:--:--</div>
+                <a th:unless="${isAdmin}" th:href="@{/jobs/add}" class="btn btn-gold">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    New Job
+                </a>
+            </div>
+        </div>
+
+        <div class="page-body">
+
+            <!-- Flash messages -->
+            <div th:if="${success}" class="flash flash-success">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <span th:text="${success}"></span>
+            </div>
+
+            <!-- Database warning -->
+            <div th:if="${!dbOk}" style="display:flex;align-items:flex-start;gap:12px;padding:14px 18px;border-radius:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);margin-bottom:20px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <div style="font-size:13px;color:#94aacb;"><strong style="color:#fbbf24;">Database Unreachable</strong> — Go to cloud.mongodb.com → Network Access → Add IP Address → Allow Access from Anywhere, then refresh.</div>
+            </div>
+
+            <!-- Toolbar: search + filters -->
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+                <form th:action="@{/jobs}" method="get" style="display:flex;align-items:center;gap:8px;flex:1;min-width:280px;max-width:480px;">
+                    <input type="hidden" name="invoiceStatus" th:if="${invoiceStatusFilter != null}" th:value="${invoiceStatusFilter}"/>
+                    <input type="hidden" name="status" th:if="${statusFilter != null}" th:value="${statusFilter}"/>
+                    <div class="search-bar" style="flex:1;display:flex;align-items:center;gap:10px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <input type="text" id="jobsSearchInput" name="search" th:value="${search}" placeholder="Search job no, congsigune, description…" style="flex: 1;"/>
+                        <button type="button" id="jobsSearchClear" class="btn btn-outline" style="display: none; font-size: 11px; padding: 3px 8px; border-radius: 6px; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); white-space: nowrap; height: 22px; line-height: 1;">Reset</button>
+                    </div>
+                    <button type="submit" class="btn btn-gold" style="padding: 9.5px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; outline: none; display: flex; align-items: center; gap: 4px;">
+                        Search
+                    </button>
+                </form>
+
+                <div class="filter-tabs" th:if="${invoiceStatusFilter == null}">
+                    <a th:href="@{/jobs}" class="filter-tab" th:classappend="${statusFilter == null and invoiceStatusFilter == null} ? 'active'">All</a>
+                    <a th:href="@{/jobs(status='PENDING')}"     class="filter-tab" th:classappend="${statusFilter == 'PENDING'}     ? 'active'">Pending</a>
+                    <a th:href="@{/jobs(status='IN_PROGRESS')}" class="filter-tab" th:classappend="${statusFilter == 'IN_PROGRESS'} ? 'active'">In Progress</a>
+                    <a th:href="@{/jobs(status='COMPLETED')}"   class="filter-tab" th:classappend="${statusFilter == 'COMPLETED'}   ? 'active'">Completed</a>
+                </div>
+            </div>
+
+            <!-- Jobs Table -->
+            <div class="card" style="padding:0;">
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Job No</th>
+                                <th>Date</th>
+                                <th>Congsigune</th>
+                                <th>Description</th>
+                                <th>Chassis / Container</th>
+                                <th>BL No</th>
+                                <th>Drive</th>
+                                <th th:if="${isAdmin}">Bill Amount</th>
+                                <th th:if="${isAdmin}">Advance</th>
+                                <th th:if="${isAdmin}">Balance</th>
+                                <th>Invoice Status</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(jobs)}">
+                                <td th:colspan="${isAdmin ? 14 : 11}">
+                                    <div class="empty-state">
+                                        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                        <p th:if="${isAdmin}">No jobs found.</p>
+                                        <p th:unless="${isAdmin}">No jobs found. <a th:href="@{/jobs/add}" style="color:var(--gold)">Add your first job →</a></p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr th:each="job, stat : ${jobs}"
+                                th:classappend="${job.status == 'PENDING'} ? 'row-pending' : (${job.status == 'IN_PROGRESS'} ? 'row-inprog' : 'row-done')">
+                                <td th:text="${stat.count}">1</td>
+                                <td class="bold" th:text="${job.jobNo}">—</td>
+                                <td th:text="${job.date != null ? #temporals.format(job.date,'dd MMM yy') : '—'}">—</td>
+                                <td th:text="${job.companyName ?: '—'}">—</td>
+                                <td th:text="${job.description ?: '—'}">—</td>
+                                <td style="font-size:12px;" th:text="${job.chassisContainerNo ?: '—'}">—</td>
+                                <td style="font-size:12px;" th:text="${job.blNumber ?: '—'}">—</td>
+                                <td>
+                                    <span th:if="${job.driveType}" style="font-size:11px;padding:2px 8px;border-radius:50px;background:rgba(255,255,255,0.06);color:var(--slate);" th:text="${job.driveType}"></span>
+                                    <span th:unless="${job.driveType}">—</span>
+                                </td>
+                                <td th:if="${isAdmin}" th:text="${job.blAmount != null ? 'LKR ' + #numbers.formatDecimal(job.blAmount,1,'COMMA',0,'POINT') : '—'}">—</td>
+                                <td th:if="${isAdmin}" th:text="${job.advance != null ? 'LKR ' + #numbers.formatDecimal(job.advance,1,'COMMA',0,'POINT') : '—'}">—</td>
+                                <td th:if="${isAdmin}" class="bold" th:text="${job.balance != null ? 'LKR ' + #numbers.formatDecimal(job.balance,1,'COMMA',0,'POINT') : '—'}">—</td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${job.invoiceStatus == 'PAID'} ? 'badge-done' : 'badge-pending'"
+                                          th:text="${job.invoiceStatus ?: 'PENDING'}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge"
+                                          th:classappend="${job.status == 'PENDING'} ? 'badge-pending' : (${job.status == 'IN_PROGRESS'} ? 'badge-inprog' : 'badge-done')"
+                                          th:text="${job.status == 'IN_PROGRESS'} ? 'In Progress' : ${#strings.capitalize(#strings.toLowerCase(job.status))}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <div style="display:flex;gap:5px;align-items:center;">
+                                        <a th:if="${isAdmin and (job.invoiceGenerated or job.status == 'COMPLETED')}"
+                                           th:href="@{/jobs/invoice/{id}/pdf(id=${job.id})}"
+                                           class="btn btn-outline btn-sm btn-icon"
+                                           title="View Invoice"
+                                           target="_blank"
+                                           style="color: #2ecc71; border-color: rgba(46, 204, 113, 0.3); background: rgba(46, 204, 113, 0.05);">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                        </a>
+                                        <a th:href="@{/jobs/view/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="View">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        </a>
+                                        <a th:href="@{/jobs/edit/{id}(id=${job.id})}" class="btn btn-outline btn-sm btn-icon" title="Edit">
+                                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                        </a>
+                                        <form th:action="@{/jobs/delete/{id}(id=${job.id})}" method="post"
+                                              onsubmit="return confirm('Delete job #' + this.dataset.jobno + '?');"
+                                              th:attr="data-jobno=${job.jobNo}" style="display:inline;">
+                                            <button type="submit" class="btn btn-danger btn-sm btn-icon" title="Delete">
+                                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+(function(){const el=document.getElementById('dash-clock');function tick(){el.textContent=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});}tick();setInterval(tick,1000);})();
+
+(function() {
+    const input = document.getElementById('jobsSearchInput');
+    const clearBtn = document.getElementById('jobsSearchClear');
+    if (input && clearBtn) {
+        clearBtn.style.display = input.value ? 'inline-block' : 'none';
+        input.addEventListener('input', function() {
+            clearBtn.style.display = input.value ? 'inline-block' : 'none';
+        });
+        clearBtn.addEventListener('click', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasSearchParam = urlParams.has('search') && urlParams.get('search');
+            if (hasSearchParam) {
+                const status = urlParams.get('status') || '';
+                const invoiceStatus = urlParams.get('invoiceStatus') || '';
+                let destUrl = '/jobs';
+                const queryParts = [];
+                if (status) queryParts.push('status=' + encodeURIComponent(status));
+                if (invoiceStatus) queryParts.push('invoiceStatus=' + encodeURIComponent(invoiceStatus));
+                if (queryParts.length > 0) {
+                    destUrl += '?' + queryParts.join('&');
+                }
+                window.location.href = destUrl;
+            } else {
+                input.value = '';
+                clearBtn.style.display = 'none';
+                input.focus();
+            }
+        });
+    }
+})();
+</script>
+</body>
+</html>
